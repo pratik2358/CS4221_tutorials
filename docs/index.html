@@ -1,31 +1,9 @@
-<!--
-README — How this works (keep this comment at the top of index.html)
-1) Put your PDFs in the same repo under the folder /slides (you can rename it; see CONFIG below).
-2) Add this file (index.html) and viewer.html under /docs so GitHub Pages can serve them.
-   Repo layout example:
-     /slides/lecture1.pdf
-     /slides/lecture2.pdf
-     /docs/index.html
-     /docs/viewer.html
-3) In GitHub → Settings → Pages → Build and deployment: "Deploy from a branch",
-   Branch: main (or your default), Folder: /docs. Save.
-4) Visit: https://<your-username>.github.io/<repo>  (or your custom domain) to see the gallery.
-5) This page lists PDFs from your repo via the GitHub API and opens them in a minimal PDF.js-based
-   slide viewer (viewer.html) with keyboard controls (←/→, space, f for fullscreen).
-6) If your repo is private, the public site cannot list files via the API. Options:
-   - Make the repo public (simplest), or
-   - Manually list PDFs in MANUAL_PDFS below, or
-   - Generate a manifest (pdfs.json) via a GitHub Action and load that instead.
-
-NOTE: No build step needed. Everything runs client-side on GitHub Pages.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IT5008 Tutorial Slides</title>
+  <title>CS4221/5421 Tutorial Slides</title>
   <style>
     :root {
       --maxw: 1100px;
@@ -52,7 +30,7 @@ NOTE: No build step needed. Everything runs client-side on GitHub Pages.
 </head>
 <body>
   <header>
-    <h1>IT5008 Tutorial Slides</h1>
+    <h1>CS4221/5421 Tutorial Slides</h1>
     <div class="muted">Click a card to open the slide viewer. Keyboard: ←/→ or space for navigation, <code>f</code> for fullscreen.</div>
   </header>
 
@@ -66,7 +44,7 @@ NOTE: No build step needed. Everything runs client-side on GitHub Pages.
   <script type="module">
     // ======== CONFIG — change these to match your repo ========
     const OWNER = "pratik2358";           // your GitHub username (already known)
-    const REPO  = "IT5008__25_26";            // <-- set to your repository name
+    const REPO  = "CS4221_tutorials";            // <-- set to your repository name
     const BRANCH = "main";                // default branch
     const PDF_PATH = "slides";            // folder containing PDFs
     // Optional manual list (used if API listing fails or repo is private)
