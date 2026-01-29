@@ -1,0 +1,401 @@
+\documentclass{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{overlay-beamer-styles}
+\usepackage{booktabs,multicol,stackengine}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage{cancel}
+\usepackage{moresize}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\definecolor{nus-orange}{RGB}{239,124,0}
+\definecolor{nus-blue}{RGB}{0,61,124}
+\definecolor{halfgray}{gray}{0.55}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\bfseries\color{nus-blue},
+  stringstyle=\color{ForestGreen},
+  numbers=left,
+  numberstyle=\scriptsize\color{halfgray},
+  rulesepcolor=\color{nus-orange},
+  frame=shadowbox,
+  columns=flexible,
+  showstringspaces=false,
+  keepspaces=true,
+  tabsize=2,
+  breaklines=true
+}
+
+\renewcommand{\figurename}{Figure}
+\renewcommand{\algorithmname}{Algorithm}
+
+\usepackage{SHU}
+\input{macros}
+
+\title{CS4221/5421: Tutorial 1 — Entity-Relationship Model}
+\author{\href{https://pratik2358.github.io/}{Pratik Karmakar}}
+\institute{School of Computing,\\ National University of Singapore}
+\date{AY25/26 S1}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+  \IfFileExists{nus-logo.png}{
+    \begin{figure}[htpb]\centering
+      \includegraphics[keepaspectratio, scale=0.18]{nus-logo.png}
+    \end{figure}
+  }{}
+\end{frame}
+
+\section{Question}
+
+\begin{frame}{The Problem Statement}
+\tiny
+Students at the National University of Ngendipura (NUN) buy books for their studies. They also lend and borrow books to and from other students. Your company, Apasaja Private Limited, is commissioned by NUN Students Association (NUNStA) to implement an online book exchange system that records information about students, books that they own and books
+that they lend and borrow.
+
+The database records the name, faculty, and department of each student. Each student is identified in the system by his/her email. The database also records the date at which the student joined the university. If a student has graduated, the database record the date of graduation. A department in NUN must belong to exactly one faculty.
+
+The database records the title, authors, publisher, language, year as well as the ISBN-10 and ISBN-13 for each book. A book can have several authors but it must have at least one author. The database also records author that currently has no book. It should also record the format of the book (i.e., if the book is hardcover or softcover). The International Standard
+Book Number, ISBN-10 or -13, is an industry standard for the unique identification of books. It is possible that the database records books that are not owned by any student (e.g., because the owners of a copy graduated or because the book was advised by a lecturer for a course but
+not yet purchased by any student).
+
+A student may own multiple copies of the same book. We differentiate the copy by its copy number. For instance, John may own two copies of the book Database Systems with ISBN-13 number of 9780131873254. The first copy has a copy number of 1 while the second copy has a copy number of 2. The copy number should be a consecutive number starting from 1.
+
+The database also records the date at which a book copy is borrowed and the date at which it is returned. We refer to this information as a loan record. Obviously, a student can only borrow or lend book after he/she is enrolled.
+
+For auditing purposes the database records information about the books, the copies and the owners of the copies as long as the owners are students or as there are loan records concerning the copies. For auditing purposes the database records information about graduated students as long as there are loan records concerning books that they owned.
+\end{frame}
+
+\begin{frame}{Questions}
+    \begin{itemize}
+        \item Entity-Relationship Design
+        \begin{itemize}
+            \item Identify entity sets.
+            \item Identify relationship sets.
+            \item For each entity set and relationship set, identify its attributes.
+            \item For each entity set, identify its identifying attributes.
+            \item Draw the corresponding entity-relationship diagram with the key and participation constraints. Indicate in English the constraints that cannot be captured, if any.
+        \end{itemize}
+        \item Logical Design
+        \begin{itemize}
+            \item Translate your entity-relationship diagram into a relational schema. Give the SQL DDL statements to create the schema. Declare the necessary integrity constraints. Indicate in English the constraints that cannot be captured, if any.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+\section{Solution}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (01).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (02).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (03).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (04).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (05).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (06).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (07).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (08).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (09).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (10).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (11).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (12).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (13).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (14).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (15).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (16).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (17).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (18).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (19).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (20).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (21).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (22).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (23).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (24).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (25).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (26).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (27).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (28).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (29).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (30).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (31).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (32).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (33).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (34).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (35).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (36).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (37).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (38).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (39).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (40).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (41).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (42).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (43).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (44).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (45).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (46).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (47).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (48).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (49).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (50).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (51).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (52).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (53).pdf}
+\end{frame}
+
+\begin{frame}{The ER Diagram}
+\centering
+\includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/slide (54).pdf}
+\end{frame}
+
+\begin{frame}{Constraints \textbf{NOT} enforced}
+    There are constraints that have not been enforced here. Those can be enforced using \textbf{triggers}.
+    \begin{itemize}
+        \item The copy number should be a consecutive number starting from 1.
+        \item Obviously, a student can only borrow or lend book after he/she is enrolled.
+    \end{itemize}
+\end{frame}
+
+\section{About the SQL DDL}
+
+\begin{frame}{Constraints \textbf{NOT} enforced}
+    \small
+    \begin{itemize}
+        \item For the “graduation dates”, we choose to merge the entity set with the \textcolor{blue}{\texttt{students}} (which automatically merge this with the relationship set). Unfortunately, this means \textcolor{blue}{\texttt{g\_date}} can be \textcolor{blue}{\texttt{NULL}}.
+        
+        The alternative is to separate the entity sets. However, with this, the lower bound 1 is not enforced. Additionally, we cannot easily check that \textcolor{blue}{g\_date} is greater than or equal to \textcolor{blue}{s\_join}.
+        
+        There is a similar issue with “return dates”.
+        \item or “copy numbers”, we also merge the entity set to the relationship set. This is the same issue of (1,n) participation discussed in lecture. Luckily, “copy numbers” has no other attributes. So merging it allows for all constraints to be enforced.
+        
+        There is a similar issue with “borrow dates” and with the same solution.
+    \end{itemize}
+\end{frame}
+
+\section{End}
+\begin{frame}
+\begin{center}
+Questions?\\
+Drop a mail at: pratik.karmakar@u.nus.edu
+\end{center}
+\end{frame}
+
+\end{document}

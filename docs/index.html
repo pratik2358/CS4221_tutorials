@@ -1,0 +1,163 @@
+<!--
+README — How this works (keep this comment at the top of index.html)
+1) Put your PDFs in the same repo under the folder /slides (you can rename it; see CONFIG below).
+2) Add this file (index.html) and viewer.html under /docs so GitHub Pages can serve them.
+   Repo layout example:
+     /slides/lecture1.pdf
+     /slides/lecture2.pdf
+     /docs/index.html
+     /docs/viewer.html
+3) In GitHub → Settings → Pages → Build and deployment: "Deploy from a branch",
+   Branch: main (or your default), Folder: /docs. Save.
+4) Visit: https://<your-username>.github.io/<repo>  (or your custom domain) to see the gallery.
+5) This page lists PDFs from your repo via the GitHub API and opens them in a minimal PDF.js-based
+   slide viewer (viewer.html) with keyboard controls (←/→, space, f for fullscreen).
+6) If your repo is private, the public site cannot list files via the API. Options:
+   - Make the repo public (simplest), or
+   - Manually list PDFs in MANUAL_PDFS below, or
+   - Generate a manifest (pdfs.json) via a GitHub Action and load that instead.
+
+NOTE: No build step needed. Everything runs client-side on GitHub Pages.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IT5008 Tutorial Slides</title>
+  <style>
+    :root {
+      --maxw: 1100px;
+      --gap: 16px;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background:#0b1020; color:#e9ecf1; }
+    header { max-width: var(--maxw); margin: 24px auto; padding: 0 16px; }
+    h1 { font-size: clamp(22px, 4vw, 28px); margin: 0 0 4px; }
+    .muted { color:#9fb0c7; font-size: 14px; }
+
+    .grid { max-width: var(--maxw); margin: 16px auto 40px; padding: 0 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: var(--gap); }
+    .card { background: #121a33; border:1px solid #1f2b54; border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+    .thumb { background: #0a0f22; display: grid; place-items: center; aspect-ratio: 16 / 10; }
+    .thumb canvas { max-width: 100%; height: auto; display:block; }
+    .caption { padding: 10px 12px; font-size: 14px; line-height: 1.35; border-top:1px solid #1f2b54; color:#dbe6f6; }
+    a.card { text-decoration: none; }
+
+    .error { max-width: var(--maxw); margin: 24px auto; padding: 12px 16px; color:#ffd2d2; background:#3a1212; border:1px solid #6a1a1a; border-radius: var(--radius); }
+    footer { max-width: var(--maxw); margin: 0 auto 40px; padding: 0 16px; color:#9fb0c7; font-size: 12px; }
+    code { background:#0f1730; padding:2px 6px; border-radius:6px; border:1px solid #213163; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>IT5008 Tutorial Slides</h1>
+    <div class="muted">Click a card to open the slide viewer. Keyboard: ←/→ or space for navigation, <code>f</code> for fullscreen.</div>
+  </header>
+
+  <div id="grid" class="grid" aria-live="polite"></div>
+  <div id="err" class="error" style="display:none"></div>
+
+  <footer>
+    <p></p>
+  </footer>
+
+  <script type="module">
+    // ======== CONFIG — change these to match your repo ========
+    const OWNER = "pratik2358";           // your GitHub username (already known)
+    const REPO  = "IT5008__25_26";            // <-- set to your repository name
+    const BRANCH = "main";                // default branch
+    const PDF_PATH = "slides";            // folder containing PDFs
+    // Optional manual list (used if API listing fails or repo is private)
+    const MANUAL_PDFS = [
+      // Example:
+      // { name: "lecture1.pdf", url: `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${PDF_PATH}/lecture1.pdf` },
+    ];
+
+    // ======== Helper: build API + raw URLs ========
+    const apiURL  = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PDF_PATH}?ref=${BRANCH}`;
+    const rawURL  = (name) => `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${PDF_PATH}/${encodeURIComponent(name)}`;
+    const viewURL = (pdfUrl) => `viewer.html?file=${encodeURIComponent(pdfUrl)}`;
+
+    const grid = document.getElementById("grid");
+    const err  = document.getElementById("err");
+
+    // Load pdf.js (for thumbnails) — using ESM build from jsDelivr
+    import { GlobalWorkerOptions, getDocument } from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.mjs";
+    GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.mjs";
+
+    async function fetchPDFsViaAPI() {
+      const res = await fetch(apiURL);
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const data = await res.json();
+      return data
+        .filter(item => item.type === 'file' && /\.pdf$/i.test(item.name))
+        .map(item => ({ name: item.name, url: item.download_url || rawURL(item.name) }));
+    }
+
+    async function renderThumb(canvas, url) {
+      try {
+        const loadingTask = getDocument({ url, disableStream: true, disableAutoFetch: true });
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(1);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const targetWidth = 320; // px
+        const scale = Math.min(1.5, targetWidth / baseViewport.width);
+        const viewport = page.getViewport({ scale });
+
+        const ratio = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(viewport.width * ratio);
+        canvas.height = Math.floor(viewport.height * ratio);
+        canvas.style.width = Math.floor(viewport.width) + 'px';
+        canvas.style.height = Math.floor(viewport.height) + 'px';
+
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        await page.render({ canvasContext: ctx, viewport }).promise;
+      } catch (e) {
+        // If thumbnail fails (e.g., CORS or large PDF), just ignore silently.
+      }
+    }
+
+    function card({ name, url }) {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = viewURL(url);
+      a.setAttribute('aria-label', name);
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      const canvas = document.createElement('canvas');
+      thumb.appendChild(canvas);
+
+      const caption = document.createElement('div');
+      caption.className = 'caption';
+      caption.textContent = name;
+
+      a.appendChild(thumb); a.appendChild(caption);
+      grid.appendChild(a);
+      renderThumb(canvas, url);
+    }
+
+    async function main() {
+      let files = [];
+      try {
+        files = await fetchPDFsViaAPI();
+        if (files.length === 0 && MANUAL_PDFS.length === 0) throw new Error("No PDFs found in the folder.");
+      } catch (e) {
+        if (MANUAL_PDFS.length > 0) {
+          files = MANUAL_PDFS;
+        } else {
+          err.style.display = '';
+          err.textContent = `Could not list PDFs via API: ${e.message}. If this is a private repo, either make it public, or fill MANUAL_PDFS in index.html.`;
+          return;
+        }
+      }
+      files.forEach(card);
+    }
+
+    main();
+  </script>
+</body>
+</html>

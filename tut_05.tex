@@ -1,0 +1,285 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\usepackage{outlines}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath,amssymb}
+\usepackage{moresize}
+\usepackage{tikz}
+\usetikzlibrary{overlay-beamer-styles}
+\usepackage{microtype}
+\usepackage[
+  backend=biber,
+  style=alphabetic,
+]{biblatex}
+\usepackage{latexsym,multicol,booktabs,calligra}
+\usepackage{listings,stackengine}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage{cancel}
+\renewcommand{\figurename}{Figure}
+\renewcommand{\algorithmname}{Algorithm}
+
+\usepackage{SHU}
+\setbeamersize{text margin left=7mm, text margin right=7mm}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+\definecolor{halfgray}{gray}{0.55}
+\definecolor{nus-orange}{RGB}{239,124,0}
+\definecolor{nus-blue}{RGB}{0,61,124}
+
+\lstset{
+  language=SQL,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\bfseries\color{nus-blue},
+  emphstyle=\ttfamily\color{nus-blue},
+  stringstyle=\color{deepgreen},
+  numbers=left,
+  numberstyle=\small\color{halfgray},
+  rulesepcolor=\color{nus-orange},
+  frame=shadowbox,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  keepspaces=true,
+  columns=flexible,
+  upquote=true
+}
+
+\author{\href{https://pratik2358.github.io/}{Pratik Karmakar}}
+\title{IT2002: Tutorial 5 — Relational Algebra}
+\institute{
+  School of Computing,\\
+  National University of Singapore
+}
+\date{AY25/26 S1}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+  \begin{figure}[htpb]
+    \begin{center}
+      \includegraphics[keepaspectratio, scale=0.18]{nus-logo.png}
+    \end{center}
+  \end{figure}
+\end{frame}
+
+% ------------------------
+\section{Setup}
+\begin{frame}{Scenario}
+\small
+Students at the \textbf{National University of Ngendipura (NUN)} buy, lend, and borrow books.\\
+NUNStA commissions \emph{Apasaja Private Limited} to implement an online book exchange system that records:
+\begin{itemize}\itemsep3pt
+  \item Students: name, faculty, department, \textbf{email}, join year.
+  \item Books: title, authors, publisher, edition, \textbf{ISBN10}, \textbf{ISBN13}.
+  \item Loans: \texttt{borrowed} date, \texttt{returned} date (\texttt{NULL} if active).
+\end{itemize}
+Auditing preserves records of graduated students and copies with loans.\\
+This tutorial uses the schema/data from “SQL: Creating and Populating Tables.”
+\end{frame}
+
+% ------------------------
+\section{Questions}
+\begin{frame}{Questions}
+\footnotesize
+\begin{enumerate}
+  \item Relational Algebra
+  \begin{itemize}
+    \item[(a)] Find the different departments in School of Computing.
+    \item[(b)] Find emails of students who borrowed/lent a book \emph{before} joining the University.
+    \item[(c)] Find emails of students who borrowed but did not lend a book \emph{on} joining day.
+  \end{itemize}
+  \item Universal Quantification
+  \begin{itemize}
+    \item[(a)] Find emails and names of students who borrowed \emph{all} books authored by Adam Smith.
+  \end{itemize}
+\end{enumerate}
+\end{frame}
+
+% ------------------------
+\section{Relational Algebra}
+\begin{frame}[fragile]{1(a).\ Departments in School of Computing}
+\textbf{Relational Algebra:}\\
+\[
+\pi_{d.department}(\sigma_{d.faculty='School\ of\ Computing'}(\rho(department, d)))
+\]
+
+\textbf{SQL Equivalent:}
+\begin{lstlisting}
+SELECT d.department
+FROM department d
+WHERE d.faculty = 'School of Computing';
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{1(b).\ Borrowed or lent before joining}
+\textbf{Relational Algebra:}\\
+$
+\pi_{s.email}(
+\sigma_{(s.email=l.borrower \lor s.email=l.owner)\wedge(l.borrowed<s.year)}
+(\rho(student,s)\times\rho(loan,l)))
+$
+
+\textbf{SQL Equivalent:}
+\begin{lstlisting}
+SELECT s.email
+FROM student s, loan l
+WHERE (s.email = l.borrower OR s.email = l.owner)
+  AND l.borrowed < s.year;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{1(b).\ Alternative Forms}
+\textbf{Using INNER JOIN:}
+\begin{lstlisting}
+SELECT s.email
+FROM student s
+INNER JOIN loan l
+ON (s.email = l.borrower OR s.email = l.owner)
+AND l.borrowed < s.year;
+\end{lstlisting}
+
+\textbf{Using UNION:}
+\begin{lstlisting}
+SELECT s1.email
+FROM loan l1, student s1
+WHERE s1.email = l1.borrower
+  AND l1.borrowed < s1.year
+UNION
+SELECT s2.email
+FROM loan l2, student s2
+WHERE s2.email = l2.owner
+  AND l2.borrowed < s2.year;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{1(c).\ Borrowed but did not lend on joining day}
+\textbf{Relational Algebra:}\\
+$
+\pi_{s1.email}(\sigma_{s1.email=l1.borrower \wedge l1.borrowed=s1.year}
+(\rho(student,s1)\times\rho(loan,l1)))
+-
+\pi_{s2.email}(\sigma_{s2.email=l2.owner \wedge l2.borrowed=s2.year}
+(\rho(student,s2)\times\rho(loan,l2)))
+$
+
+\textbf{SQL Equivalent:}
+\begin{lstlisting}
+SELECT s1.email
+FROM loan l1, student s1
+WHERE s1.email = l1.borrower
+  AND l1.borrowed = s1.year
+EXCEPT
+SELECT s2.email
+FROM loan l2, student s2
+WHERE s2.email = l2.owner
+  AND l2.borrowed = s2.year;
+\end{lstlisting}
+\end{frame}
+
+% ------------------------
+\section{Universal Quantification}
+
+\begin{frame}[fragile]{2(a).\ Borrowed all books by Adam Smith}
+\textbf{SQL Nested Query:}
+\begin{lstlisting}
+SELECT s.email, s.name
+FROM student s
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM book b
+  WHERE b.authors = 'Adam Smith'
+    AND NOT EXISTS (
+      SELECT 1
+      FROM loan l
+      WHERE l.book = b.ISBN13
+        AND l.borrower = s.email));
+\end{lstlisting}
+\textit{Idea:} For each student, check that there is no Adam Smith book that they have not borrowed.
+\end{frame}
+
+\begin{frame}{2(a).\ Relational Algebra Strategy}
+\small
+Break the problem into steps (universal quantification via set difference):
+
+\begin{enumerate}
+  \item \textbf{Find all Adam Smith books.}  
+    \[
+      Q1 = \pi_{\text{ISBN13}}
+           (\sigma_{\text{authors = 'Adam Smith'}}(\text{book}))
+    \]
+
+  \item \textbf{Form all possible student–book pairs (expected borrowings).}  
+    \[
+      Q2 = \pi_{\text{email, name, ISBN13}}(\text{student} \times Q1)
+    \]
+
+  \item \textbf{Find actual borrowings of Adam Smith books.}  
+    \[
+      Q3 = \pi_{\text{email, name, ISBN13}}
+           (\text{student} \bowtie \text{loan} \bowtie
+            \sigma_{\text{authors='Adam Smith'}}(\text{book}))
+    \]
+
+  \item \textbf{Identify missing borrowings (pairs in Q2 but not in Q3).}  
+    \[
+      Q4 = Q2 - Q3
+    \]
+
+  \item \textbf{Remove students in Q4 from the set of all students.}  
+    \[
+      Q5 = \pi_{\text{email, name}}(\text{student}) -
+           \pi_{\text{email, name}}(Q4)
+    \]
+\end{enumerate}
+
+\textbf{Answer:} $Q5$ = students who borrowed \emph{all} Adam Smith books.
+\end{frame}
+
+\begin{frame}[fragile]{2(a).\ SQL from Relational Algebra}
+\begin{lstlisting}
+SELECT s.email, s.name
+FROM student s
+EXCEPT
+SELECT t.email, t.name
+FROM (
+  SELECT s1.email, s1.name, b1.ISBN13
+  FROM student s1, book b1
+  WHERE b1.authors = 'Adam Smith'
+  EXCEPT
+  SELECT s2.email, s2.name, b2.ISBN13
+  FROM student s2
+       JOIN loan l2 ON s2.email = l2.borrower
+       JOIN book b2 ON b2.ISBN13 = l2.book
+  WHERE b2.authors = 'Adam Smith'
+) AS t;
+\end{lstlisting}
+\end{frame}
+
+% ------------------------
+\section{Guidelines}
+\begin{frame}{Guidelines \& Remarks}
+\small
+\begin{itemize}\itemsep4pt
+  \item Use relational algebra to reason about SQL queries.
+  \item Remember: EXCEPT in SQL corresponds to set difference (−) in algebra.
+  \item Joins in SQL correspond to natural/θ-joins in algebra.
+  \item Break universal quantification into difference-based subqueries.
+  \item Keep queries readable: aliases, indentation, uppercase SQL keywords.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+Questions?\\
+Drop a mail at: pratik.karmakar@u.nus.edu
+\end{center}
+\end{frame}
+
+\end{document}
