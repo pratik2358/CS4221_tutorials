@@ -366,7 +366,7 @@ For auditing purposes the database records information about the books, the copi
 \includegraphics[keepaspectratio, scale = 0.4]{tut_01_files/ERD-54.pdf}
 \end{frame}
 
-\begin{frame}{Constraints \textbf{NOT} enforced}
+\begin{frame}{Constraints \textbf{NOT} enforced (In the ERD)}
     There are constraints that have not been enforced here. Those can be enforced using \textbf{triggers}.
     \begin{itemize}
         \item The copy number should be a consecutive number starting from 1.
@@ -376,8 +376,9 @@ For auditing purposes the database records information about the books, the copi
 
 \section{About the SQL DDL}
 
-\begin{frame}{Constraints \textbf{NOT} enforced}
+\begin{frame}{Constraints \textbf{NOT} enforced (In the DDL code)}
     \small
+    The DDL code is \href{https://github.com/pratik2358/CS4221_tutorials/blob/main/tut_01_files/T01.sql}{\textcolor{blue}{here}}.
     \begin{itemize}
         \item For the “graduation dates”, we choose to merge the entity set with the \textcolor{blue}{\texttt{students}} (which automatically merge this with the relationship set). Unfortunately, this means \textcolor{blue}{\texttt{g\_date}} can be \textcolor{blue}{\texttt{NULL}}.
         
