@@ -3,8 +3,9 @@
 \usepackage[english]{babel}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb}
-\usepackage{algorithm}
-\usepackage{algorithmic}
+% \usepackage{algorithm}
+% \usepackage{algorithmic}
+\usepackage[ruled,vlined]{algorithm2e}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{caption}
@@ -14,6 +15,9 @@
 \usepackage[table,dvipsnames]{xcolor}
 \usepackage{cancel}
 \usepackage{moresize}
+\usepackage{apxproof}
+\usepackage{multicol}
+\usepackage[normalem]{ulem}
 
 \usepackage{hyperref}
 
@@ -43,7 +47,7 @@
 \usepackage{SHU}
 \input{macros}
 
-\title{IT2002: Tutorial 7 — Functional Dependencies}
+\title{CS4221/5421: Tutorial 7 — Functional Dependencies}
 \author{\href{https://pratik2358.github.io/}{Pratik Karmakar}}
 \institute{School of Computing,\\ National University of Singapore}
 \date{AY25/26 S1}
@@ -91,216 +95,324 @@ $W, X, Y, Z$ mentioned here are \alert{sets} of attributes.\\
 \section{Solutions}
 
 \begin{frame}[fragile]{Question 1.a.}
-\tiny
-Your company, Apasaja Private Limited, is commissioned by \emph{Toko Kopi Luwak} to design the relational schema for coffee beans, drinks, and cafes. We are given
+\footnotesize
+Consider the following schema $R$ and the set of functional dependencies $\Sigma$.
 \[
-R=\{A,B,C,D,E,F,G,H\},\\
-\Sigma=\{\{A\} \to \{C,E\},\{A,B\} \to \{D\},\{F\} \to \{H\},\{C,E\} \to \{A\},\{B,C,E\} \to \{D\},\{A,B,F\} \to \{D,G\},\{B,C,E,F\} \to \{G\}\}.
+R=\{A,B,C,D,E\},\\
+\Sigma=\{\{C, D\} \to \{A,B\},\{A,B,C\} \to \{E\},\{B,C,D\} \to \{A,E\},\{B,D\} \to \{A\},\{A,C\} \to \{B,E\}\}.
 \]
+
+\pause
+Show that $\Sigma \vdash \{C,D\} \to \{A,B,C,D\}$ using Armstrong's axioms.
+\begin{columns}
+    \column{0.3\textwidth}
+        \begin{enumerate}
+            \item $\{C,D\} \to \{A,B\}$
+            \item $\{A,B,C\} \to \{E\}$
+            \item $\{B,C,D\}\to \{A,E\}$
+            \item $\{B,D\} \to \{A\}$
+            \item $\{A,C\} \to \{B,E\}$
+        \end{enumerate}
+    \pause
+    \column{0.65\textwidth}
+    \begin{enumerate}
+    \setcounter{enumi}{5}
+        \item $\{C,D\} \to \{A,B,C,D\}$ (Augmentation of (1) with $\{C,D\}$)
+        \pause
+        \item $\{B,C,D\} \to \{A,B,C,D,E\}$ (Augmentation of (3) with $\{B,C,D\}$)
+        \pause
+        \item $\{A,B,C,D\}\to \{B,C,D\}$ (Reflexivity)
+        \pause
+        \item $\{C,D\}\to \{B,C,D\}$ (Transitivity between (6) and (8))
+        \pause
+        \item $\{C,D\}\to \{A,B,C,D,E\}$ (Transitivity between (9) and (7))
+    \end{enumerate}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Question 1.b.}
+\scriptsize
+\[
+R=\{A,B,C,D,E\},\\
+\Sigma=\{\{C, D\} \to \{A,B\},\{A,B,C\} \to \{E\},\{B,C,D\} \to \{A,E\},\{B,D\} \to \{A\},\{A,C\} \to \{B,E\}\}.
+\]\\
+Show that $\Sigma \vDash \{C,D\} \to \{A,B,E\}$ using \textbf{The Chase}.
 
 \pause
 \footnotesize
-\vspace{0.5em}
 \begin{columns}
-\begin{column}{0.48\textwidth}
-\vspace{0.5em}
-\textbf{Attribute mapping}\\[-0.2em]
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Symbol} & \textbf{Meaning} \\
-\midrule
-A & \texttt{name} (bean brand) \\
-B & \texttt{dname} (drink name) \\
-C & \texttt{cultivar} \\
-D & \texttt{price} \\
-\bottomrule
-\end{tabular}
-\end{column}
+\column{0.24\textwidth}
+    \begin{table}
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+        \textbf{A} &\textbf{B} &\textbf{C} &\textbf{D} &\textbf{E} \\ \hline
+        \alpha &\alpha &\alpha &\alpha &\alpha \\ \hline
+        $a_1$ &$b_1$ &$c_1$ &$d_1$ & $e_1$\\
+        \hline
+    \end{tabular}}
+    \caption*{\tiny Setup}
+    \label{tab:setup}
+\end{table}
 \pause
-\begin{column}{0.48\textwidth}
-\textbf{Attribute mapping}\\[-0.2em]
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Symbol} & \textbf{Meaning} \\
-\midrule
-E & \texttt{region} \\
-F & \texttt{bname} (branch) \\
-G & \texttt{qty} (quantity sold) \\
-H & \texttt{address} \\
-\bottomrule
-\end{tabular}
-\end{column}
+\column{0.24\textwidth}
+    \begin{table}
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+        \textbf{A} &\textbf{B} &\textbf{C} &\textbf{D} &\textbf{E} \\ \hline
+        \alpha &\alpha &\alpha &\alpha &\alpha \\ \hline
+        $a_1$ &$b_1$ &\cellcolor{blue!15}$\alpha$ &\cellcolor{blue!15}$\alpha$ & $e_1$\\
+        \hline
+    \end{tabular}}
+    \caption*{\tiny Initialization}
+    \label{tab:initialization}
+\end{table}
+\pause
+\column{0.24\textwidth}
+    \begin{table}
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+        \textbf{A} &\textbf{B} &\textbf{C} &\textbf{D} &\textbf{E} \\ \hline
+        \alpha &\alpha &\alpha &\alpha &\alpha \\ \hline
+        \cellcolor{green!15}$\alpha$ &\cellcolor{green!15}$\alpha$ &\cellcolor{blue!15}$\alpha$ &\cellcolor{blue!15}$\alpha$ & $e_1$\\
+        \hline
+    \end{tabular}}
+    \caption*{\tiny $\{C,D\}\to\{A,B\}$}
+    \label{tab:chasing_cd_ab}
+\end{table}
+\pause
+\column{0.24\textwidth}
+    \begin{table}
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+        \textbf{A} &\textbf{B} &\textbf{C} &\textbf{D} &\textbf{E} \\ \hline
+        \alpha &\alpha &\alpha &\alpha &\alpha \\ \hline
+        \cellcolor{blue!15}$\alpha$ &\cellcolor{blue!15}$\alpha$ &$\alpha$ &\cellcolor{blue!15}$\alpha$ &\cellcolor{green!15} $\alpha$\\
+        \hline
+    \end{tabular}}
+    \caption*{\tiny $\{A,C,D\}\to\{E\}$}
+    \label{tab:chasing_cd_ab}
+\end{table}
 \end{columns}
-
-\medskip
-\scriptsize
-\textcolor{teal}{Notes: A bean is identified by \alert{name} or by \alert{(cultivar, region)}; a drink name is unique \emph{per bean}; branches sell drinks, with address and quantity recorded.}
+We stop here as we have already reached $\{C,D\}\to \{A,B,E\}$ (the values in the second row to look at).
 \end{frame}
 
-\begin{frame}{Question 1.b. \; Candidate keys via closures}
+\begin{frame}{Question 1.c.}
+\small
+Show that $\{A,C\}\to \{D\}$ does not hold on $R$ with $\Sigma$ using Algorithm~\ref{alg:attribute-closure}.
 \scriptsize
-$\Sigma=\{\{A\} \to \{C,E\},\{A,B\} \to \{D\},\{F\} \to \{H\},\{C,E\} \to \{A\},\{B,C,E\} \to \{D\},\{A,B,F\} \to \{D,G\},\{B,C,E,F\} \to \{G\}\}$.\\
-\textbf{Observation:} Since \alert{$B$} and \alert{$F$} never appear on the RHS of any FD, \alert{every key must contain $B$ and $F$}. We enumerate closures starting from supersets of $\{B,F\}$.
+\begin{algorithm}[H]
+\caption{Attribute Closure Algorithm}
+\label{alg:attribute-closure}
 
+\KwIn{$S$, $\Sigma$}
+\KwOut{$S^{+}$}
+
+$\Omega \gets \Sigma$\tcp*[r]{unused}
+$\Gamma \gets S$\tcp*[r]{closure}
+
+\While{there exists $(X \to Y) \in \Omega$ such that $X \subseteq \Gamma$}{
+    $\Omega \gets \Omega \setminus \{X \to Y\}$\;
+    $\Gamma \gets \Gamma \cup Y$\;
+}
+
+\Return{$\Gamma$}\;
+
+\end{algorithm}
+Using Algorithm~\ref{alg:attribute-closure} we get $\{A,C\}^+ = \{A,B,C,E\}$. As $D\notin \{A,C\}^+$, $\{A,C\} \nrightarrow \{D\}$\\
+From $\Sigma$ we get $\{A,C\}\to \{B,E\}$. $\{B\}$ determines nothing other than $\{B\}$. Same holds for $\{E\}$. Also, we see $\{B,E\}$ determines nothing other than $\{B,E\}$.
+
+\end{frame}
+
+\begin{frame}[fragile]{Question 1.d.}
+Find all keys of $R$ w.r.t. $\Sigma$.
+\pause
+If we go algorithmically, we need to find the closures of all subsets of R.
 \pause
 \tiny
-\vspace{0.3cm}
-\begin{columns}
-\begin{column}{0.32\textwidth}
-\textbf{Size 2}\\
-$\{B,F\}^+ = \{B,F,H\}$ \; (not a key)
-
-\medskip
-\textbf{Size 3 (supersets of $\{B,F\}$)}\\
-$\alert{\{A,B,F\}^+ = \{A,B,C,D,E,F,G,H\}}$ \\
-$\{B,C,F\}^+ = \{B,C,F,H\}$ \\
-$\{B,D,F\}^+ = \{B,D,F,H\}$ \\
-$\{B,E,F\}^+ = \{B,E,F,H\}$ \\
-$\{B,F,G\}^+ = \{B,F,G,H\}$ \\
-$\{B,F,H\}^+ = \{B,F,H\}$
-\end{column}
-\pause
-\begin{column}{0.34\textwidth}
-\textbf{Size 4 (not containing $\{A,B,F\}$)}\\
-$\{B,C,D,F\}^+ = \{B,C,D,F,H\}$ \\
-$\alert{\{B,C,E,F\}^+ = \{A,B,C,D,E,F,G,H\}}$ \\
-$\{B,C,F,G\}^+ = \{B,C,F,G,H\}$ \\
-$\{B,C,F,H\}^+ = \{B,C,F,H\}$ \\
-$\{B,D,E,F\}^+ = \{B,D,E,F,H\}$ \\
-$\{B,D,F,G\}^+ = \{B,D,F,G,H\}$ \\
-$\{B,D,F,H\}^+ = \{B,D,F,H\}$ \\
-$\{B,E,F,G\}^+ = \{B,E,F,G,H\}$ \\
-$\{B,E,F,H\}^+ = \{B,E,F,H\}$ \\
-$\{B,F,G,H\}^+ = \{B,F,G,H\}$
-\end{column}
-\pause
-\begin{column}{0.34\textwidth}
-\textbf{Larger supersets} (that are not supersets of keys above)\\
-All such closures remain proper subsets of $R$.
-
-\medskip
-\textbf{Conclusion}\\
-\alert{Candidate keys: $\{A,B,F\}$ and $\{B,C,E,F\}$.}
-\end{column}
-\end{columns}
-
-\medskip
-\scriptsize
-\begin{center}
-    Tedious by hand?\\
-I made your life a bit easier: \href{https://github.com/pratik2358/fucntional_dep}{\textcolor{blue}{Here}}
-\end{center}
-\end{frame}
-
-\begin{frame}{Question 1.c. \; Prime attributes}
-\small
-Keys are \alert{$\{A,B,F\}$} and \alert{$\{B,C,E,F\}$}. Prime attributes are those that appear in at least one key.
-
-\medskip
+\begin{multicols}{3}
+\noindent
 \[
-\text{Prime attributes} \;=\; \{A,B,F\}\cup\{B,C,E,F\} \;=\; \alert{\{A,B,C,E,F\}}.
+\{A\}^{+}=\{A\}
 \]
+\[
+\{B\}^{+}=\{B\}
+\]
+\[
+\{C\}^{+}=\{C\}
+\]
+\[
+\{D\}^{+}=\{D\}
+\]
+\[
+\{E\}^{+}=\{E\}
+\]
+\[
+\{A,B\}^{+}=\{A,B\}
+\]
+\[
+\{A,C\}^{+}=\{A,B,C,E\}
+\]
+\[
+\{A,D\}^{+}=\{A,D\}
+\]
+\[
+\{A,E\}^{+}=\{A,E\}
+\]
+\[
+\{B,C\}^{+}=\{B,C\}
+\]
+\[
+\{B,D\}^{+}=\{A,B,D\}
+\]
+\[
+\{B,E\}^{+}=\{B,E\}
+\]
+\[
+\textcolor{red}{\{C,D\}^{+}=\{A,B,C,D,E\}}
+\]
+\[
+\{C,E\}^{+}=\{C,E\}
+\]
+\[
+\{D,E\}^{+}=\{D,E\}
+\]
+\[
+\{A,B,C\}^{+}=\{A,B,C,E\}
+\]
+\[
+\{A,B,D\}^{+}=\{A,B,D\}
+\]
+\[
+\{A,B,E\}^{+}=\{A,B,E\}
+\]
+\[
+\textcolor{blue}{\{A,C,D\}^{+}=\{A,B,C,D,E\}}
+\]
+\[
+\{A,C,E\}^{+}=\{A,B,C,E\}
+\]
+\[
+\{A,D,E\}^{+}=\{A,D,E\}
+\]
+\[
+\textcolor{blue}{\{B,C,D\}^{+}=\{A,B,C,D,E\}}
+\]
+\[
+\{B,C,E\}^{+}=\{B,C,E\}
+\]
+\[
+\{B,D,E\}^{+}=\{A,B,D,E\}
+\]
+\[
+\textcolor{blue}{\{C,D,E\}^{+}=\{A,B,C,D,E\}}
+\]
+\[
+\textcolor{blue}{\{A,B,C,D\}^{+}=\{A,B,C,D,E\}}
+\]
+\[
+\{A,B,C,E\}^{+}=\{A,B,C,E\}
+\]
+\[
+\{A,B,D,E\}^{+}=\{A,B,D,E\}
+\]
+\[
+\textcolor{blue}{\{A,C,D,E\}^{+}=\{A,B,C,D,E\}}
+\]
+\[
+\textcolor{blue}{\{B,C,D,E\}^{+}=\{A,B,C,D,E\}}
+\]
+\[
+\textcolor{blue}{\{A,B,C,D,E\}^{+}=\{A,B,C,D,E\}}
+\]
+\end{multicols}
 \end{frame}
 
-\begin{frame}[fragile]{Question 2.a. \; Minimal cover of $R$ with $\Sigma$}
+\begin{frame}[fragile]{Question 1.e.}
+\scriptsize
+Find one minimal cover of $\Sigma = \{\{C, D\} \to \{A,B\},\{A,B,C\} \to \{E\},\{B,C,D\} \to \{A,E\},\{B,D\} \to \{A\},\{A,C\} \to \{B,E\}\}$
 \tiny
+\vspace{0.1cm}
 \begin{columns}
-\begin{column}{0.30\textwidth}
-\textbf{Start from $\Sigma$:}\\
-\(
-\{A\} \to \{C,E\},\\
-\{A,B\} \to \{D\},\\
-\{F\} \to \{H\},\\
-\{C,E\} \to \{A\},\\
-\{B,C,E\} \to \{D\},\\
-\{A,B,F\} \to \{D,G\},\\
-\{B,C,E,F\} \to \{G\}.
-\)
-\end{column}
-
 \pause
-\begin{column}{0.30\textwidth}
-\textcolor{teal}{Step 1: Split RHS}\\
-\(
-\{A\} \to \{C\},\\
-\{A\} \to \{E\},\\
-\{A,B\} \to \{D\},\\
-\{F\} \to \{H\},\\
-\{C,E\} \to \{A\},\\
-\{B,C,E\} \to \{D\},\\
-\{A,B,F\} \to \{D\},\\
-\{A,B,F\} \to \{G\},\\
-\{B,C,E,F\} \to \{G\}.
-\)
-\end{column}
-\pause
-\begin{column}{0.40\textwidth}
-\textcolor{blue}{Step 2: Reduce LHS where possible}\\
-\(
-\{A\} \to \{C\},\\
-\{A\} \to \{E\},\\
-\{A,B\} \to \{D\},\\
-\{F\} \to \{H\},\\
-\{C,E\} \to \{A\},\\
-\{B,C,E\} \to \{D\},\\
-\{A,B,\cancel{F}\} \to \{D\}\text{ because } \{A,B\} \to \{D\}\\
-\{A,B,F\} \to \{G\},\\
-\{B,C,E,F\} \to \{G\}.
-\)
-\end{column}
+    \column{0.32\textwidth}
+    \textbf{Step 1: Simplify the RHS}
+    \begin{enumerate}
+        \item $\{C,D\}\to \{A\}$
+        \item $\{C,D\}\to \{B\}$
+        \item $\{A,B,C\}\to \{E\}$
+        \item $\{B,C,D\} \to \{A\}$
+        \item $\{B,C,D\} \to \{E\}$
+        \item $\{B,D\}\to \{A\}$
+        \item $\{A,C\}\to \{B\}$
+        \item $\{A,C\}\to\{E\}$
+    \end{enumerate}
+    \pause
+    \column{0.32\textwidth}
+    \textbf{Step 2: Simplify the LHS}
+    \begin{enumerate}
+    \setcounter{enumi}{8}
+        \item $\{C,D\}\to \{A\}$
+        \item $\{C,D\}\to \{B\}$
+        \item $\{A,C\}\to \{E\}$ From (8)
+        \item $\{B,D\}\to \{A\}$ From (6)
+        \item $\{C,D\}\to \{E\}$ From $\{C,D\}^+$
+        \item $\{B,D\}\to \{A\}$
+        \item $\{A,C\}\to \{B\}$
+        \item $\{A,C\}\to\{E\}$
+    \end{enumerate}
+    \pause
+    \column{0.32\textwidth}
+    \textbf{Remove redundancies}
+    \begin{enumerate}
+    \setcounter{enumi}{16}
+        \item \sout{$\{C,D\}\to \{A\}$} As it can be derived from (10) and (14)
+        \item $\{C,D\}\to \{B\}$
+        \item \sout{$\{A,C\}\to \{E\}$} As we have it in (16)
+        \item \sout{$\{B,D\}\to \{A\}$} As we have it in (14)
+        \item \sout{$\{C,D\}\to \{E\}$} (10) and (14) $\implies$ $\{C,D\} \to \{A,C\}$. Now transitivity with (16).
+        \item $\{B,D\}\to \{A\}$
+        item $\{A,C\}\to \{B\}$
+        \item $\{A,C\}\to\{E\}$
+    \end{enumerate}
 \end{columns}
+\normalsize
+So we get one minimal cover: $\{\{C,D\}\to\{B\}, \{B,D\}\to \{A\}, \{A,C\}\to\{B\}, \{A,C\}\to \{E\}\}$
 \end{frame}
 
-\begin{frame}[fragile]{Question 2.a. \; Minimal cover of $R$ with $\Sigma$}
-\begin{columns}
-    \begin{column}{0.5\textwidth}
-        \textcolor{teal}{Step 3: Remove redundancies}\\
-        \(
-\{A\} \to \{C\},\\
-\{A\} \to \{E\},\\
-\cancel{\textcolor{gray}{\{A,B\} \to \{D\}}}\tiny\text{ Already exists (repetition)},\\
-\normalsize
-\{F\} \to \{H\},\\
-\{C,E\} \to \{A\},\\
-\{B,C,E\} \to \{D\},\\
-\cancel{\textcolor{gray}{\{A,B\} \to \{D\}}}\tiny\text{ because }\{A\}\to\{C,E\} \text{ and } \{B,C,E\}\to\{D\},\\
-\normalsize
-\cancel{\textcolor{gray}{\{A,B,F\} \to \{G\}}}\tiny\text{ because }\{A\}\to\{C,E\} \text{ and } \{B,C,E,F\}\to\{G\},\\
-\normalsize
-\{B,C,E,F\} \to \{G\}.
-\)
-    \end{column}
-    \begin{column}{0.5\textwidth}
-        \textcolor{red}{Minimal Cover}\\
-\(
-\{A\} \to \{C\},\\
-\{A\} \to \{E\},\\ 
-\{F\} \to \{H\},\\ 
-\{C,E\} \to \{A\},\\
-\{B,C,E\} \to \{D\},\\ 
-\{B,C,E,F\} \to \{G\} .
-\)
-    \end{column}
-\end{columns}
-\medskip
-\scriptsize
-\pause
-(Alternative minimal covers exist, e.g., replace $\{B,C,E\} \to \{D\}$ by $\{A,B\} \to \{D\}$ and $\{B,C,E,F\} \to \{G\}$ by $\{A,B,F\} \to \{G\}$.) \hfill
+\begin{frame}{Q 2.}
+    Consider the following entity-relationship diagram. Find all functional dependencies that hold on $R$.
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\linewidth]{tut_07_images/er_diag.png}
+        % \caption{Caption}
+        \label{fig:ERD}
+    \end{figure}
 \end{frame}
 
-\begin{frame}[fragile]{Question 2.b. \; Compact Minimal Cover (merged by LHS)}
+\begin{frame}{Q 2. Solution}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.6\linewidth]{tut_07_images/er_diag.png}
+        % \caption{Caption}
+        \label{fig:ERD2}
+    \end{figure}
 \small
-One Compact Minimal Cover (aka Canonical Cover) (grouping by identical LHS) is:\\
-\(
-\{A\} \to \{C,E\},\\ 
-\{F\} \to \{H\},\\ 
-\{C,E\} \to \{A\},\\ 
-\{B,C,E\} \to \{D\},\\ 
-\{B,C,E,F\} \to \{G\}
-\)
-
-\medskip
-\scriptsize
+\begin{itemize}
+    \item From $R1$ we have $\{A,B\}\to C$.
+    \item From $R2$ we have $\{D\}\to\{E\}$.
+    \item From $R3$ we do not have anything extra.
+    \item From participation of $R1$ and $R2$ in $S$, $\{A,B\} \to \{D\}$ and also $\{D\}\to \{A,B\}$. We also have $\{A,B\}\to\{G\}$ and $\{D\}\to \{G\}$.
+    \item From participation of $R1$, $R2$ and $R3$ in $S$, we have $\{A,B\}\to \{F\}$, and $\{D\}\to \{F\}$.
+\end{itemize}
 \end{frame}
 
 \begin{frame}
